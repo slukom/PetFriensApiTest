@@ -1,5 +1,7 @@
 # PetFriensApiTest
 
-Тестирование API проекта PetFriens https://petfriends1.herokuapp.com/
+Тестирование API проекта PetFriens https://petfriends1.herokuapp.com/. 
 
-Описание API https://petfriends1.herokuapp.com/apidocs/
+Тесты (позитивные и негативные) реализованы в файле tests_pet_friends.py, который необходимо запустить для старта прогона 
+
+С описанием API можно ознакомится по ссылке: https://petfriends1.herokuapp.com/apidocs/
