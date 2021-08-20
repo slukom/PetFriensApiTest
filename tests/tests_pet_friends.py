@@ -234,7 +234,7 @@ def test_add_new_pet_with_invalid_photo(name='Барсик', animal_type='cat', 
 
 
 def test_add_new_pet_with_invalid_auth_key(name='Шарик', animal_type='dog', age='7', pet_photo='../images/dog.jpg'):
-    """Тест на проверку создания питомца, вместо фото pdf-файл"""
+    """Тест на проверку создания питомца c невалидным ключом"""
 
     # Создаем невалидный api ключ
     auth_key = {'key': 'invalid'}
@@ -244,7 +244,7 @@ def test_add_new_pet_with_invalid_auth_key(name='Шарик', animal_type='dog',
 
     # Отправляем запрос на создание нового питомца с фото
     status, result = pf.add_new_pet(auth_key, name, animal_type, age, pet_photo)
-    print(status)
+
     # Проверяем, что ответ на запрос имеет статус 403
     assert status == 403
 
