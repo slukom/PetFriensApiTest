@@ -8,7 +8,7 @@ pf = PetFriends()
 
 @pytest.fixture()
 def get_key():
-   status, key = pf.get_api_key(valid_email, valid_password)
+   _, status, key = pf.get_api_key(valid_email, valid_password)
    assert status == 200
    assert 'key' in key
    assert status == 200
@@ -18,12 +18,12 @@ def get_key():
 @pytest.mark.positive
 @pytest.mark.api
 @pytest.mark.auth
-@pytest.mark.skip(reason="Не использует фикстуру get_key")
+#@pytest.mark.skip(reason="Не использует фикстуру get_key")
 def test_get_api_key_for_valid_user(email=valid_email, password=valid_password):
     """Тест на проверку получения api ключа"""
 
     # Отправляем запрос на получение api ключа
-    status, result = pf.get_api_key(email, password)
+    _, status, result = pf.get_api_key(email, password)
 
     #  Проверяем, что ответ на запрос имеет статус 200 и в тексте ответа содержится поле 'key'
     assert status == 200
@@ -40,7 +40,7 @@ def test_get_all_pets_with_valid_key(get_key, filter = ''):
     # _, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Отправляем запрос на получение списка всех питомцев
-    status, result = pf.get_list_of_pets(get_key, filter)
+    _, status, result = pf.get_list_of_pets(get_key, filter)
 
     # Проверяем, что ответ на запрос имеет статус 200 и в тексте ответа содержится список питомцев
     assert status == 200
@@ -60,7 +60,7 @@ def test_add_new_pet_with_valid_data_jpeg(get_key, name='Барсик', animal_t
     pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
 
     # Отправляем запрос на создание нового питомца с фото
-    status, result = pf.add_new_pet(get_key, name, animal_type, age, pet_photo)
+    _, status, result = pf.add_new_pet(get_key, name, animal_type, age, pet_photo)
 
     # Проверяем, что ответ на запрос имеет статус 200 и в тексте ответа содержится имя питомца
     assert status == 200
@@ -81,7 +81,7 @@ def test_add_new_pet_with_valid_data_png(get_key, name='Снежок', animal_ty
     pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
 
     # Отправляем запрос на создание нового питомца с фото
-    status, result = pf.add_new_pet(get_key, name, animal_type, age, pet_photo)
+    _, status, result = pf.add_new_pet(get_key, name, animal_type, age, pet_photo)
 
     # Проверяем, что ответ на запрос имеет статус 200 и в тексте ответа содержится имя питомца
     assert status == 200
@@ -95,10 +95,10 @@ def test_successful_create_new_pet_without_photo(get_key, name='Кельвин',
     """Тест на проверку успешного создания питомца без фото"""
 
     # Получаем api ключ
-    #_, auth_key = pf.get_api_key(valid_email, valid_password)
+    #_, _, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Отправляем запрос на создание нового питомца с фото
-    status, result = pf.create_pet_without_photo(get_key, name, animal_type, age)
+    _, status, result = pf.create_pet_without_photo(get_key, name, animal_type, age)
 
     # Проверяем, что ответ на запрос имеет статус 200 и в тексте ответа содержится имя питомца
     assert status == 200
@@ -112,24 +112,24 @@ def test_successful_delete_pet(get_key):
     """Тест на проверку успешного удаления питомца"""
 
     # Получаем api ключ
-    #_, auth_key = pf.get_api_key(valid_email, valid_password)
+    #_, _, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Получаем список моих питомцев
-    _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
+    _, _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
 
     # Если список пуст, то добавляем нового питомца
     if len(my_pets['pets']) == 0:
         pf.add_new_pet(get_key, "Пушок", "cat", "3", "../images/cat.jpeg")
-        _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
+        _, _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
 
     # Запоминаем id первого питомца
     pet_id = my_pets['pets'][0]['id']
 
     # Отправляем запрос на удаление питомца
-    status, result = pf.delete_pet(get_key, pet_id)
+    _, status, result = pf.delete_pet(get_key, pet_id)
 
     # Снова получаем список моих питомцев
-    _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
+    _, _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
 
     # Проверяем, что ответ на запрос имеет статус 200 и в тексте ответа нет id удаленного питомца
     assert status == 200
@@ -143,15 +143,15 @@ def test_update_pet_with_valid_date(get_key, new_name = "Пончик", new_anim
     """Тест на проверку успешного обновления питомца"""
 
     # Получаем api ключ
-    #_, auth_key = pf.get_api_key(valid_email, valid_password)
+    #_, _, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Получаем список моих питомцев
-    _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
+    _, _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
 
     # Если список не пуст, то обновляем данные первого питомца
     if len(my_pets['pets']) > 0:
         pet_id = my_pets['pets'][0]['id']
-        status, result = pf.update_pet(get_key, pet_id, new_name, new_animal_type, new_age)
+        _, status, result = pf.update_pet(get_key, pet_id, new_name, new_animal_type, new_age)
 
         # Проверяем, что ответ на запрос имеет статус 200 и в тексте имя совпадает с новым именем
         assert status == 200
@@ -168,15 +168,15 @@ def test_successful_add_photo(get_key, pet_photo='../images/dog.jpg'):
     """Тест на проверку успешного добавления фото питомца"""
 
     # Получаем api ключ
-    #_, auth_key = pf.get_api_key(valid_email, valid_password)
+    #_, _, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Получаем список моих питомцев
-    _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
+    _, _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
 
     # Если список пуст, то добавляем нового питомца
     if len(my_pets['pets']) == 0:
         pf.create_pet_without_photo(get_key, "Эрвин", "dog", "3")
-        _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
+        _, _, my_pets = pf.get_list_of_pets(get_key, "my_pets")
 
     # Запоминаем id первого питомца
     pet_id = my_pets['pets'][0]['id']
@@ -185,7 +185,7 @@ def test_successful_add_photo(get_key, pet_photo='../images/dog.jpg'):
     pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
 
     # Отправляем запрос на добавление фото питомца
-    status, result = pf.add_pet_photo(get_key, pet_id, pet_photo)
+    _, status, result = pf.add_pet_photo(get_key, pet_id, pet_photo)
 
     # Проверяем, что ответ на запрос имеет статус 200 и в тексте ответа есть поле с фото
     assert status == 200
@@ -203,7 +203,7 @@ def test_get_api_key_for_invalid_user(email="q@q.q", password="q"):
     """Тест на проверку получения api ключа c невалидными данными"""
 
     # Отправляем запрос на получение api ключа
-    status, result = pf.get_api_key(email, password)
+    _, status, result = pf.get_api_key(email, password)
 
     #  Проверяем, что ответ на запрос имеет статус 403
     assert status == 403
@@ -217,7 +217,7 @@ def test_get_api_key_for_user_with_empty_data(email="", password=""):
     """Тест на проверку получения api ключа c пустыми полями"""
 
     # Отправляем запрос на получение api ключа
-    status, result = pf.get_api_key(email, password)
+    _, status, result = pf.get_api_key(email, password)
 
     #  Проверяем, что ответ на запрос имеет статус 403
     assert status == 403
@@ -234,7 +234,7 @@ def test_get_all_pets_with_empty_auth_key(filter = ''):
     auth_key = {'key': ''}
 
     # Отправляем запрос на получение списка всех питомцев
-    status, result = pf.get_list_of_pets(auth_key, filter)
+    _, status, result = pf.get_list_of_pets(auth_key, filter)
 
     # Проверяем, что ответ на запрос имеет статус 403
     assert status == 403
@@ -251,7 +251,7 @@ def test_get_all_pets_with_invalid_auth_key(filter = ''):
     auth_key = {'key': '123'}
 
     # Отправляем запрос на получение списка всех питомцев
-    status, result = pf.get_list_of_pets(auth_key, filter)
+    _, status, result = pf.get_list_of_pets(auth_key, filter)
 
     # Проверяем, что ответ на запрос имеет статус 403
     assert status == 403
@@ -267,7 +267,7 @@ def test_get_all_pets_with_invalid_filter(get_key, filter = 'dogs'):
     #_, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Отправляем запрос на получение списка всех питомцев
-    status, result = pf.get_list_of_pets(get_key, filter)
+    _, status, result = pf.get_list_of_pets(get_key, filter)
 
     # Проверяем, что ответ на запрос имеет статус 500
     assert status == 500
@@ -280,13 +280,13 @@ def test_add_new_pet_with_invalid_photo(get_key, name='Барсик', animal_typ
     """Тест на проверку создания питомца, вместо фото pdf-файл"""
 
     # Получаем api ключ
-    #_, auth_key = pf.get_api_key(valid_email, valid_password)
+    #_, _, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Преобразовываем адрес, по которому лежит фото питомца
     pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
 
     # Отправляем запрос на создание нового питомца с фото
-    status, result = pf.add_new_pet(get_key, name, animal_type, age, pet_photo)
+    _, status, result = pf.add_new_pet(get_key, name, animal_type, age, pet_photo)
 
     # Проверяем, что ответ на запрос имеет статус 500
     assert status == 500
@@ -306,7 +306,7 @@ def test_add_new_pet_with_invalid_auth_key(name='Шарик', animal_type='dog',
     pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
 
     # Отправляем запрос на создание нового питомца с фото
-    status, result = pf.add_new_pet(auth_key, name, animal_type, age, pet_photo)
+    _, status, result = pf.add_new_pet(auth_key, name, animal_type, age, pet_photo)
 
     # Проверяем, что ответ на запрос имеет статус 403
     assert status == 403
@@ -319,10 +319,10 @@ def test_create_new_pet_without_photo_with_empty_data(get_key, name='', animal_t
     """Тест на проверку создания питомца без фото, с пустыми данными"""
 
     # Получаем api ключ
-    #_, auth_key = pf.get_api_key(valid_email, valid_password)
+    #_, _, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Отправляем запрос на создание нового питомца с фото
-    status, result = pf.create_pet_without_photo(get_key, name, animal_type, age)
+    _, status, result = pf.create_pet_without_photo(get_key, name, animal_type, age)
 
     # Проверяем, что ответ на запрос имеет статус 200 и в тексте ответа содержится пустое имя питомца
     assert status == 200
@@ -336,10 +336,10 @@ def test_create_new_pet_without_photo_with_literal_age(get_key, name='Марта
     """Тест на проверку создания питомца без фото, если значение возраста состоит из букв"""
 
     # Получаем api ключ
-    #_, auth_key = pf.get_api_key(valid_email, valid_password)
+    #_, _, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Отправляем запрос на создание нового питомца с фото
-    status, result = pf.create_pet_without_photo(get_key, name, animal_type, age)
+    _, status, result = pf.create_pet_without_photo(get_key, name, animal_type, age)
 
     # Проверяем, что ответ на запрос имеет статус 200 и в тексте ответа содержится пустое имя питомца
     assert status == 200
@@ -353,7 +353,7 @@ def test_add_photo_with_invalid_pet_id(get_key, pet_photo='../images/dog.jpg'):
     """Тест на проверку добавления фото c невалидным id питомца"""
 
     # Получаем api ключ
-    #_, auth_key = pf.get_api_key(valid_email, valid_password)
+    #_, _, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Создаем невалидный id питомца
     pet_id = '-'
@@ -362,7 +362,7 @@ def test_add_photo_with_invalid_pet_id(get_key, pet_photo='../images/dog.jpg'):
     pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
 
     # Отправляем запрос на добавление фото питомца
-    status, result = pf.add_pet_photo(get_key, pet_id, pet_photo)
+    _, status, result = pf.add_pet_photo(get_key, pet_id, pet_photo)
 
     # Проверяем, что ответ на запрос имеет статус 500
     assert status == 500
@@ -375,13 +375,13 @@ def test_unsuccessful_delete_pet_with_empty_pet_id(get_key):
     """Тест на проверку неуспешного удаления питомца, по пустому pet_id"""
 
     # Получаем api ключ
-    #_, auth_key = pf.get_api_key(valid_email, valid_password)
+    #_, _, auth_key = pf.get_api_key(valid_email, valid_password)
 
     # Создаем пустой pet_id
     pet_id = ''
 
     # Отправляем запрос на удаление питомца
-    status, result = pf.delete_pet(get_key, pet_id)
+    _, status, result = pf.delete_pet(get_key, pet_id)
 
     # Проверяем, что ответ на запрос имеет статус 404
     assert status == 404

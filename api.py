@@ -3,6 +3,27 @@ import requests
 
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
+filename = 'log.txt'
+f = open(filename, 'w')
+f.close()
+
+
+def debug(func):
+    """Выводит сигнатуру функции и возвращаемое значение"""
+    def wrapper_debug(*args, **kwargs):
+        args_repr = [repr(a) for a in args]
+        kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]
+        signature = ", ".join(args_repr + kwargs_repr)
+        #print(f"Вызываем {func.__name__}({signature})")
+        value = func(*args, **kwargs)
+        f = open(filename, 'a')
+        f.write(f"\n\nФункция{func.__name__!r} отправила запрос: {value[0].request.method!r} {value[0].request.url!r}")
+        f.write(f"\nЗаголовок запроса: {value[0].request.headers!r}\nПараметры пути запроса: {value[0].request.path_url!r}")
+        f.write(f"\nПараметры строки запроса: {value[0].request.url!r}\nТело запроса: {value[0].request.body!r}")
+        f.write(f"\nКод ответа: {value[1]!r}\nТело ответа: {value[2]!r}")
+        return value
+    return wrapper_debug
+
 
 class PetFriends:
     """API библиотека к веб-приложению Pet Friends"""
@@ -10,6 +31,7 @@ class PetFriends:
     def __init__(self):
         self.base_url = "https://petfriends1.herokuapp.com/"
 
+    @debug
     def get_api_key(self, email: str, password: str) -> json:
         """Метод отправляет запрос на получение ключа API и возвращает статус запроса и результат в формате JSON
         с уникальным ключаом пользователя, найденного по указанным email и паролем"""
@@ -27,9 +49,11 @@ class PetFriends:
             result = res.json()
         except:
             result = res.text
-        return status, result
 
+        print('\nres.request.url = ', res.request)
+        return res, status, result
 
+    @debug
     def get_list_of_pets(self, auth_key: json, filter: str = "") -> json:
         """Метод отправляет запрос на получение списка питомцев, соответствующих фильтру, и возвращает статус
         запроса и результат в формате JSON. На данный момент фильтр может иметь либо пустое значение - получить
@@ -51,9 +75,11 @@ class PetFriends:
             result = res.json()
         except:
             result = res.text
-        return status, result
+
+        return res, status, result
 
 
+    @debug
     def add_new_pet(self, auth_key: json, name: str, animal_type: str, age: str, pet_photo: str) -> json:
         """Метод отправляет запрос на создание питомца и возвращает статус запроса и результат в формате JSON"""
 
@@ -80,9 +106,9 @@ class PetFriends:
         except:
             result = res.text
         print(result)
-        return status, result
+        return res, status, result
 
-
+    @debug
     def create_pet_without_photo(self, auth_key: json, name: str, animal_type: str, age: str) -> json:
         """Метод отправляет запрос на создание питомца без фото и возвращает статус запроса и результат в формате
         JSON"""
@@ -105,9 +131,9 @@ class PetFriends:
         except:
             result = res.text
         print(result)
-        return status, result
+        return res, status, result
 
-
+    @debug
     def delete_pet(self, auth_key: json, pet_id: str) -> json:
         """Метод отправляет запрос на удаление питомца по указанному ID  и возвращает статус запроса
         и результат в формате JSON с текстом уведомления об успешном удалении."""
@@ -123,9 +149,9 @@ class PetFriends:
             result = res.json()
         except:
             result = res.text
-        return status, result
+        return res, status, result
 
-
+    @debug
     def update_pet(self, auth_key: json, pet_id: str, new_name: str, new_animal_type: str, new_age: str) -> json:
         """Метод отправлеяет запрос на обновелние питомца по ID и возвращает статус запроса
         и результат в формате JSON об обновленном питомце."""
@@ -146,9 +172,9 @@ class PetFriends:
             result = res.json()
         except:
             result = res.text
-        return status, result
+        return res, status, result
 
-
+    @debug
     def add_pet_photo(self, auth_key: json, pet_id: str, pet_photo: str) -> json:
         """Метод отправляет запрос на добавление фото питомца и возвращает статус запроса и результат в формате JSON"""
         data = MultipartEncoder(
@@ -169,7 +195,7 @@ class PetFriends:
             result = res.json()
         except:
             result = res.text
-        return status, result
+        return res, status, result
 
 
 
